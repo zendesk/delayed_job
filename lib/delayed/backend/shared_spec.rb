@@ -178,6 +178,12 @@ shared_examples_for "a delayed_job backend" do
       YAML.should_receive(:load).and_raise(ArgumentError)
       expect{job.payload_object}.to raise_error(Delayed::DeserializationError)
     end
+
+    it "raises a DeserializationError when the YAML.load raises an unexpected error" do
+      job = described_class.new :handler => "--- !ruby/struct:GoingToRaiseArgError {}"
+      YAML.should_receive(:load).and_raise(Exception)
+      expect{job.payload_object}.to raise_error(Delayed::DeserializationError)
+    end
   end
 
   describe "reserve" do
